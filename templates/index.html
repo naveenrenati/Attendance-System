@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Roll Number Checker</title>
+
+    <!-- Add a style tag for CSS styling -->
+    <style>
+        body {
+            font-size: 18px;
+        }
+
+        h1 {
+            font-size: 24px;
+        }
+
+        /* Add more styles as needed */
+    </style>
+</head>
+<body>
+    <h1>Roll Number Checker</h1>
+
+    <form method="post" action="/">
+        <label for="roll_number">Enter Roll Number:</label>
+        <input type="text" id="roll_number" name="roll_number" required>
+        <button type="submit">Check</button>
+    </form>
+
+    {% if message %}
+        <p>{{ message }}</p>
+    {% endif %}
+
+    <form method="post" action="/capture_image">
+        <button type="submit">Capture Image</button>
+    </form>
+
+    <form method="post" action="/domatching">
+        <button type="submit">Do Matching</button>
+    </form>
+
+    {% if match_message %}
+        <p>{{ match_message }}</p>
+    {% endif %}
+</body>
+</html>

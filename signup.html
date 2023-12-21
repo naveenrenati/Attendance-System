@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Signup Page</title>
+</head>
+<body>
+    <h1>Signup</h1>
+    <form id="signupForm" enctype="multipart/form-data">
+        <label for="image">Profile Image:</label>
+        <input type="file" id="image" name="image" accept="image/*" required><br>
+
+        <label for="name">Name:</label>
+        <input type="text" id="name" name="name" required><br>
+
+        <label for="rollNumber">Roll Number:</label>
+        <input type="text" id="rollNumber" name="rollNumber" required><br>
+
+        <label for="branch">Branch:</label>
+        <input type="text" id="branch" name="branch" required><br>
+
+        <button type="button" onclick="submitForm()">Submit</button>
+    </form>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { S3Client, PutObjectCommand } from 'https://cdn.skypack.dev/@aws-sdk/client-s3';
+
+        // Your web app's Firebase configuration
+        const firebaseConfig = {
+      //////////////////////////////////
+	  //////////////////////////////////
+	  ///////////////////////////
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // Your AWS S3 configuration
+        const s3 = new S3Client({
+            region: "ap-south-1",
+            credentials: {
+                accessKeyId: "",
+                secretAccessKey: "",
+            },
+        });
+
+        window.submitForm = async function() {
+            const image = document.getElementById('image').files[0];
+            const name = document.getElementById('name').value;
+            const rollNumber = document.getElementById('rollNumber').value;
+            const branch = document.getElementById('branch').value;
+
+            // Upload image to AWS S3
+            const params = {
+                Bucket: "naveen-renati",
+                Key: `images/${image.name}`,
+                Body: image,
+            };
+
+            try {
+                await s3.send(new PutObjectCommand(params));
+
+                // Get image URL
+                const imageUrl = `https://naveen-renati.s3.amazonaws.com/images/${image.name}`;
+
+                // Save data to Firestore
+                await addDoc(collection(db, 'students'), {
+                    name: name,
+                    rollNumber: rollNumber,
+                    branch: branch,
+                    imageUrl: imageUrl,
+                });
+
+                alert('Signup successful!');
+                document.getElementById('signupForm').reset();
+            } catch (error) {
+                console.error("Error uploading to S3:", error);
+                alert('Error during signup. Please try again.');
+            }
+        };
+    </script>
+</body>
+</html>
